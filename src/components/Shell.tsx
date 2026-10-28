@@ -1,4 +1,4 @@
-import { Link, Slot, usePathname } from 'expo-router';
+import { Slot, usePathname, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { PartnersPanel } from './PartnersPanel';
 import { ToolId } from '@/data/partners';
@@ -14,18 +14,19 @@ export function Shell() {
   const { width } = useWindowDimensions();
   const desktop = width >= DESKTOP_BREAKPOINT;
   const pathname = usePathname();
+  const router = useRouter();
   const active = TOOLS.find((t) => pathname.startsWith(t.href)) ?? TOOLS[0];
 
   const nav = TOOLS.map((t) => (
-    <Link key={t.id} href={t.href} asChild>
-      <Pressable
-        accessibilityRole="tab"
-        accessibilityState={{ selected: t.id === active.id }}
-        style={[desktop ? styles.sideItem : styles.tab, t.id === active.id && styles.itemActive]}
-      >
-        <Text style={[styles.itemText, t.id === active.id && styles.itemTextActive]}>{desktop ? t.label : t.short}</Text>
-      </Pressable>
-    </Link>
+    <Pressable
+      key={t.id}
+      onPress={() => router.push(t.href)}
+      accessibilityRole="tab"
+      accessibilityState={{ selected: t.id === active.id }}
+      style={[desktop ? styles.sideItem : styles.tab, t.id === active.id && styles.itemActive]}
+    >
+      <Text style={[styles.itemText, t.id === active.id && styles.itemTextActive]}>{desktop ? t.label : t.short}</Text>
+    </Pressable>
   ));
 
   return (
