@@ -1,0 +1,23 @@
+const fs = require('fs');
+const path = require('path');
+
+const distDir = path.join(__dirname, 'dist');
+const indexPath = path.join(distDir, 'index.html');
+const jsDir = path.join(distDir, '_expo', 'static', 'js', 'web');
+
+if (fs.existsSync(indexPath) && fs.existsSync(jsDir)) {
+  const files = fs.readdirSync(jsDir);
+  const jsFile = files.find(f => f.endsWith('.js') && !f.endsWith('.map'));
+
+  if (jsFile) {
+    let html = fs.readFileSync(indexPath, 'utf8');
+    
+    // Check if script tag is already there
+    if (!html.includes(jsFile)) {
+      const scriptTag = `<script src="/_expo/static/js/web/${jsFile}" defer></script>`;
+      html = html.replace('</body>', `${scriptTag}</body>`);
+      fs.writeFileSync(indexPath, html, 'utf8');
+      console.log(`Successfully injected script: ${jsFile}`);
+    }
+  }
+}
