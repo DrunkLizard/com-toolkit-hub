@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Button, Card, Chips, Field, Hint, Row, Stat } from '@/components/ui';
+import { ProfitFaq } from '@/components/ProfitFaq';
 import { useToolkit } from '@/components/ToolkitContext';
 import { colors } from '@/theme';
 
@@ -95,6 +96,8 @@ export default function ProfitScreen() {
           ))
         )}
       </Card>
+
+      <ProfitFaq />
     </>
   );
 }
