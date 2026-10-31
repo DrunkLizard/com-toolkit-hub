@@ -44,6 +44,36 @@ const jsonLd = JSON.stringify({
   ],
 }).replace(/</g, '\\u003c');
 
+// Profit-calculator schema (previously in src/app/+html.tsx, which breaks Expo's script injection).
+const profitApp = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  '@id': `${SITE}/profit#app`,
+  name: 'Shopify Profit Calculator',
+  alternateName: 'EcomStack Profit Calculator',
+  url: `${SITE}/profit`,
+  description:
+    'Free Shopify profit calculator. Enter price, COGS, shipping, payment gateway fees and ad spend to get net profit, net margin, break-even ROAS and target CPA instantly.',
+  applicationCategory: 'BusinessApplication',
+  applicationSubCategory: 'E-commerce profit calculator',
+  operatingSystem: 'Web, iOS, Android',
+  browserRequirements: 'Requires JavaScript',
+  inLanguage: 'en',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
+  featureList: [
+    'Net profit and net margin calculation',
+    'Break-even ROAS calculation',
+    'Target CPA calculation',
+    'Payment gateway fee modelling (percentage + fixed fee)',
+    'Shipping charged vs. shipping cost',
+    'Units sold or clicks-times-conversion volume modes',
+    'Saved product presets stored on your device',
+  ],
+  audience: { '@type': 'Audience', audienceType: 'Shopify merchants, dropshippers and e-commerce marketers' },
+  publisher: { '@type': 'Organization', name: 'EcomStack', url: SITE },
+}).replace(/</g, '\\u003c');
+
 for (const [name, p] of Object.entries(PAGES)) {
   const file = path.join(dist, `${name}.html`);
   if (!fs.existsSync(file)) continue;
@@ -68,6 +98,8 @@ for (const [name, p] of Object.entries(PAGES)) {
     `<meta property="og:url" content="${SITE}${p.path}"/>`,
     `<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-readable site summary"/>`,
     `<script type="application/ld+json">${jsonLd}</script>`,
+    // "/" now renders the profit calculator too, so both get its schema.
+    ...(name === 'profit' || name === 'index' ? [`<script type="application/ld+json">${profitApp}</script>`] : []),
   ].join('');
   if (!html.includes('</head>')) throw new Error(`${name}.html has no </head>`);
   fs.writeFileSync(file, html.replace('</head>', `${tags}</head>`), 'utf8');
