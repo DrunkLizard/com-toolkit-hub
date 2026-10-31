@@ -72,5 +72,12 @@ export function useOverheadTracker() {
     };
   }, [items]);
 
-  return { items, loaded, add, remove, totals };
+  // Break-even drivers (raw strings so charts update on every keystroke).
+  const [varCost, setVarCost] = useState('8');
+  const [volume, setVolume] = useState('500');
+  const [unitPrice, setUnitPrice] = useState('25');
+
+  const fixedByCategory = useMemo(() => totals.byCategory.map(([name, monthly]) => ({ name, monthly })), [totals]);
+
+  return { items, loaded, add, remove, totals, fixedByCategory, varCost, setVarCost, volume, setVolume, unitPrice, setUnitPrice };
 }

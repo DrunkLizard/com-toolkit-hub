@@ -1,19 +1,25 @@
-import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
-import { Button, Card, Chips, Field, Hint, Row, Stat } from '@/components/ui';
+import Head from 'expo-router/head';
+import { useWindowDimensions } from 'react-native';
+import { Card, Chips, Field, Row, Stat } from '@/components/ui';
+import { ProfitGraph } from '@/components/charts/ProfitGraph';
+import { PresetsCard } from '@/components/PresetsCard';
 import { ProfitFaq } from '@/components/ProfitFaq';
 import { useToolkit } from '@/components/ToolkitContext';
-import { colors } from '@/theme';
+import { DESKTOP_BREAKPOINT } from '@/theme';
 
 const usd = (n: number) =>
   (n < 0 ? '-' : '') + '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export default function ProfitScreen() {
-  const { inputs, setField, results: r, presets, savePreset, loadPreset, deletePreset, reset } = useToolkit().profit;
-  const [name, setName] = useState('');
+  const { inputs, setField, results: r } = useToolkit().profit;
+  const desktop = useWindowDimensions().width >= DESKTOP_BREAKPOINT;
 
   return (
     <>
+      <Head>
+        <title>{'Profit & Break-Even ROAS | Merchant Toolkit'}</title>
+        <meta name="description" content="Free profit calculator for e-commerce: break-even ROAS, target CPA, net profit and margin." />
+      </Head>
       <Card title="Product economics">
         <Row>
           <Field label="Price" prefix="$" value={inputs.price} onChangeText={(v) => setField('price', v)} />
@@ -68,34 +74,13 @@ export default function ProfitScreen() {
         </Row>
       </Card>
 
-      <Card title="Saved presets">
-        <Row>
-          <Field label="Preset name" keyboardType="default" value={name} onChangeText={setName} placeholder="e.g. Hoodie – summer" />
-        </Row>
-        <Row>
-          <Button
-            label="Save preset"
-            onPress={() => {
-              if (savePreset(name)) setName('');
-            }}
-          />
-          <Button label="Reset" variant="ghost" onPress={reset} />
-        </Row>
-        {presets.length === 0 ? (
-          <Hint>No presets yet. Saved presets stay on this device.</Hint>
-        ) : (
-          presets.map((p) => (
-            <View key={p.id} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-              <Pressable onPress={() => loadPreset(p.id)} style={{ flex: 1 }} accessibilityRole="button">
-                <Text style={{ color: colors.text, fontWeight: '600' }}>{p.name}</Text>
-              </Pressable>
-              <Pressable onPress={() => deletePreset(p.id)} accessibilityRole="button" accessibilityLabel={`Delete ${p.name}`}>
-                <Text style={{ color: colors.danger, fontWeight: '600' }}>Delete</Text>
-              </Pressable>
-            </View>
-          ))
-        )}
-      </Card>
+      {!desktop && (
+        <Card title="Profit chart">
+          <ProfitGraph inputs={inputs} />
+        </Card>
+      )}
+
+      <PresetsCard />
 
       <ProfitFaq />
     </>

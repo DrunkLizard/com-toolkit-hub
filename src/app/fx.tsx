@@ -1,8 +1,11 @@
-import { Pressable, Text } from 'react-native';
+import Head from 'expo-router/head';
+import { Pressable, Text, useWindowDimensions } from 'react-native';
 import { Button, Card, Chips, Field, Hint, Row, Stat } from '@/components/ui';
+import { FxGraph } from '@/components/charts/FxGraph';
+import { FxResultsCards } from '@/components/FxResultsCards';
 import { useToolkit } from '@/components/ToolkitContext';
 import { HOME_CURRENCIES, MARKETS, fmtMoney } from '@/engines/fx';
-import { colors } from '@/theme';
+import { DESKTOP_BREAKPOINT, colors } from '@/theme';
 
 const SOURCE_LABEL = {
   live: 'Live rate',
@@ -15,6 +18,7 @@ export default function FxScreen() {
   const fx = useToolkit().fx;
   const { market, home, result: r } = fx;
   const local = market.currency;
+  const desktop = useWindowDimensions().width >= DESKTOP_BREAKPOINT;
 
   const status =
     fx.refresh === 'loading'
@@ -26,6 +30,10 @@ export default function FxScreen() {
 
   return (
     <>
+      <Head>
+        <title>{'FX & Cross-Border Tax | Merchant Toolkit'}</title>
+        <meta name="description" content="Free FX and cross-border calculator: landed cost with exchange rate, customs duty, VAT/GST and payout." />
+      </Head>
       <Card title="Pricing">
         <Hint>Your store currency</Hint>
         <Chips options={HOME_CURRENCIES.map((c) => ({ id: c, label: c }))} value={home} onChange={fx.setHome} />
@@ -41,6 +49,9 @@ export default function FxScreen() {
           <Field label="Payment fee" suffix="%" value={fx.fee} onChangeText={fx.setFee} />
         </Row>
         <Row>
+          <Field label="Customs tariff" suffix="%" value={fx.tariff} onChangeText={fx.setTariff} />
+        </Row>
+        <Row>
           <Hint>
             {status}
             {stamp}
@@ -54,7 +65,7 @@ export default function FxScreen() {
         </Row>
       </Card>
 
-      <Card title="Customer sees">
+      <Card title="Customer sees (checkout price)">
         <Row>
           <Stat label={`Price excl. ${market.taxLabel}`} value={fmtMoney(r.converted, local)} />
           <Stat label={market.taxLabel} value={fmtMoney(r.taxAmount, local)} />
@@ -62,14 +73,15 @@ export default function FxScreen() {
         </Row>
       </Card>
 
-      <Card title="You receive">
-        <Row>
-          <Stat label="FX spread cost" value={fmtMoney(r.spreadCost, local)} tone="bad" />
-          <Stat label="Payment fee" value={fmtMoney(r.feeCost, local)} tone="bad" />
-          <Stat label={`Payout (${local})`} value={fmtMoney(r.payoutLocal, local)} />
-          <Stat label={`Payout (${home})`} value={fmtMoney(r.payoutHome, home)} tone="good" hint="Excludes tax, which you remit" />
-        </Row>
-      </Card>
+
+      {!desktop && (
+        <Card title="Landed cost chart">
+          <FxGraph price={fx.price} rate={fx.rateStr} spread={fx.spread} tariff={fx.tariff} vat={fx.taxStr} currency={local} />
+        </Card>
+      )}
+
+      {/* On desktop these sit in the side column, between pricing and the chart (see Shell). */}
+      {!desktop && <FxResultsCards />}
     </>
   );
 }

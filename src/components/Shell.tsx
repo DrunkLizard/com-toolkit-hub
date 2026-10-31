@@ -1,6 +1,11 @@
 import { Slot, usePathname, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { PartnersPanel } from './PartnersPanel';
+import { FxResultsCards } from './FxResultsCards';
+import { FxGraph } from './charts/FxGraph';
+import { OverheadGraph } from './charts/OverheadGraph';
+import { ProfitGraph } from './charts/ProfitGraph';
+import { useToolkit } from './ToolkitContext';
 import { ToolId } from '@/data/partners';
 import { DESKTOP_BREAKPOINT, MAX_WIDTH, colors, radius } from '@/theme';
 
@@ -16,6 +21,8 @@ export function Shell() {
   const pathname = usePathname();
   const router = useRouter();
   const active = TOOLS.find((t) => pathname.startsWith(t.href)) ?? TOOLS[0];
+  const { profit, fx, overhead } = useToolkit();
+  const showCharts = desktop;
 
   const nav = TOOLS.map((t) => (
     <Pressable
@@ -44,7 +51,22 @@ export function Shell() {
           <View style={styles.main}>
             <Slot />
           </View>
-          <View style={desktop ? styles.aside : undefined}>
+          <View style={desktop ? [styles.aside, showCharts && styles.asideWide] : undefined}>
+            {desktop && active.id === 'fx' && <FxResultsCards />}
+            {showCharts && (
+              <View style={styles.chartCard}>
+                <Text style={styles.chartTitle}>
+                  {active.id === 'fx' ? 'Landed cost chart' : active.id === 'expenses' ? 'Cost charts' : 'Profit chart'}
+                </Text>
+                {active.id === 'fx' ? (
+                  <FxGraph price={fx.price} rate={fx.rateStr} spread={fx.spread} tariff={fx.tariff} vat={fx.taxStr} currency={fx.market.currency} />
+                ) : active.id === 'expenses' ? (
+                  <OverheadGraph fixed={overhead.fixedByCategory} varCost={overhead.varCost} volume={overhead.volume} unitPrice={overhead.unitPrice} />
+                ) : (
+                  <ProfitGraph inputs={profit.inputs} />
+                )}
+              </View>
+            )}
             <PartnersPanel tool={active.id} />
           </View>
         </View>
@@ -83,5 +105,15 @@ const styles = StyleSheet.create({
   itemText: { color: colors.text, fontSize: 14, fontWeight: '600' },
   itemTextActive: { color: colors.accentText },
   main: { flex: 1, minWidth: 0, gap: 16 },
-  aside: { width: 260 },
+  aside: { width: 260, gap: 16 },
+  asideWide: { flex: 1, minWidth: 440, maxWidth: 640 },
+  chartCard: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: radius.lg,
+    padding: 16,
+    gap: 12,
+  },
+  chartTitle: { color: colors.text, fontSize: 14, fontWeight: '700' },
 });

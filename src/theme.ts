@@ -13,5 +13,5 @@ export const colors = {
 
 export const radius = { sm: 8, md: 12, lg: 16 };
 
-export const MAX_WIDTH = 1080;
+export const MAX_WIDTH = 1680;
 export const DESKTOP_BREAKPOINT = 900;

@@ -135,5 +135,26 @@ export function useProfitCalculator() {
 
   const reset = useCallback(() => setInputs(DEFAULT_INPUTS), []);
 
-  return { inputs, setField, results, presets, savePreset, loadPreset, deletePreset, reset };
+  /** Merge presets from a parsed JSON file. Same-name presets are overwritten. Returns count imported. */
+  const importPresets = useCallback(
+    (data: unknown) => {
+      const list = Array.isArray(data) ? data : (data as { presets?: unknown })?.presets;
+      if (!Array.isArray(list)) throw new Error('Invalid preset file');
+      const valid: Preset[] = list
+        .filter((p) => p && typeof p.name === 'string' && p.name.trim() && p.inputs && typeof p.inputs === 'object')
+        .map((p, i) => ({
+          id: `${Date.now()}-${i}`,
+          name: p.name.trim(),
+          savedAt: typeof p.savedAt === 'number' ? p.savedAt : Date.now(),
+          inputs: { ...DEFAULT_INPUTS, ...p.inputs },
+        }));
+      if (valid.length === 0) throw new Error('No valid presets found');
+      const incoming = new Set(valid.map((p) => p.name.toLowerCase()));
+      persist([...valid, ...presets.filter((p) => !incoming.has(p.name.toLowerCase()))]);
+      return valid.length;
+    },
+    [presets, persist],
+  );
+
+  return { inputs, setField, results, presets, savePreset, loadPreset, deletePreset, reset, importPresets };
 }

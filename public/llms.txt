@@ -1,0 +1,24 @@
+# Merchant Toolkit
+
+> Free, no-signup e-commerce calculators for online store owners: profit and break-even ROAS, FX and cross-border landed cost, and overhead break-even tracking. Everything runs in the browser; inputs are not sent to a server and presets are stored on the user's device.
+
+Site: https://ecomstack.online
+
+## Tools
+
+- [Profit & Break-Even ROAS](https://ecomstack.online/profit): Enter price, COGS, shipping, payment-gateway fees, ad spend and volume (units, or clicks x conversion rate). Outputs break-even ROAS, target CPA, profit per unit, net profit, net margin and actual ROAS, with live charts. Presets can be saved, downloaded and uploaded as JSON.
+- [FX & Cross-Border Tax](https://ecomstack.online/fx): Enter base price, exchange rate (live rates with offline fallback), FX spread, customs tariff, VAT/GST and payment fee. Outputs the customer's checkout price, the importer's landed cost, and the seller's payout, with a stacked cost chart.
+- [Expense & Overhead Tracker](https://ecomstack.online/expenses): Track recurring costs (weekly, monthly, quarterly, yearly) by category. Enter variable cost per unit, volume and price per unit to get total monthly cost and break-even volume, with burn and break-even charts.
+
+## Formulas
+
+- Profit per unit = (price + shipping charged) - COGS - shipping cost - gateway fee, where gateway fee = (price + shipping charged) x fee % + fixed fee.
+- Break-even ROAS = revenue per unit / profit per unit. Target CPA = profit per unit.
+- Net profit = profit per unit x units - ad spend.
+- Landed cost = (base price x rate) x (1 + FX spread %) x (1 + tariff %) x (1 + VAT/GST %), with tariff applied to the spread-adjusted value and VAT applied to goods plus duty.
+- Total monthly cost = fixed costs + (variable cost per unit x volume). Break-even volume = fixed costs / (price per unit - variable cost per unit).
+
+## Notes
+
+- The "Net profit vs. ad spend" curve is illustrative: it assumes diminishing returns (units proportional to spend^0.7).
+- Partner links on the site may be affiliate links.

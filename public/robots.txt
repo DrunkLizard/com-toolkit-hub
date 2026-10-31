@@ -36,3 +36,5 @@ Allow: /
 
 User-agent: Applebot-Extended
 Allow: /
+
+Sitemap: https://ecomstack.online/sitemap.xml

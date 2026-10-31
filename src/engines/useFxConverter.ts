@@ -19,6 +19,7 @@ export function useFxConverter() {
   const [price, setPrice] = useState('49.99');
   const [spread, setSpread] = useState('1.5');
   const [fee, setFee] = useState('2.9');
+  const [tariff, setTariff] = useState('0');
   const [taxOverride, setTaxOverride] = useState<string | null>(null);
   const [manualRate, setManualRate] = useState<string | null>(null);
   const [stored, setStored] = useState<{ live: LiveRates; fresh: boolean } | null>(null);
@@ -99,6 +100,8 @@ export function useFxConverter() {
     setSpread,
     fee,
     setFee,
+    tariff,
+    setTariff,
     taxStr,
     setTax: setTaxOverride,
     rateStr,
